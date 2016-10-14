@@ -1,0 +1,139 @@
+#!perl
+
+# DATE
+# VERSION
+
+# NO_PERINCI_CMDLINE_SCRIPT
+# FRAGMENT id=shcompgen-hint completer=1 for=xman
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::Any::IfLOG '$log';
+
+use Complete::File qw(complete_file);
+use Complete::Util qw(complete_array_elem complete_comma_sep);
+use Getopt::Long::Complete qw(GetOptionsWithCompletion);
+
+my $noop = sub {};
+
+# complete with manpage as well as module name
+my $comp_man_or_mod = sub {
+    require Complete::Man;
+    require Complete::Module;
+
+    # XXX
+    undef;
+};
+
+# this is taken from App::cpanminus::script and should be updated from time to
+# time.
+GetOptionsWithCompletion(
+    sub {
+        my %args  = @_;
+        my $type      = $args{type};
+        my $word      = $args{word};
+        if ($type eq 'arg') {
+            $log->tracef("[_cpanm] Completing arg");
+            # XXX
+        } elsif ($type eq 'optval') {
+            my $ospec = $args{ospec};
+            my $opt   = $args{opt};
+            $log->tracef("[_cpanm] Completing optval (opt=$opt)");
+            if ($ospec eq 'config-file|C=s') {
+                return complete_file(filter=>'f', word=>$word);
+            } elsif ($ospec eq 'locale|L=s') {
+                require Complete::Locale;
+                return Complete::Locale::complete_locale(word => $word);
+            } elsif ($ospec eq 'manpath|M=s') {
+                require Complete::Man;
+                my $ss = Complete::Man::complete_manpage_section(word=>'');
+                complete_comma_sep(word=>$word, elems=>$ss, uniq=>1);
+            } elsif ($ospec eq 'pager|P=s') {
+                require Complete::Program;
+                my $ss = Complete::Program::complete_program(word=>$word);
+            }
+        }
+        return [];
+    },
+    'config-file|C=s' => $noop,
+    'debug|d' => $noop,
+    'default|D' => $noop,
+    'warnings=s' => $noop,
+    'whatis|f' => $noop,
+    'apropos|k' => $noop,
+    'global-apropos|K' => $noop,
+    'local-file|l' => $noop,
+    'where|path|location|w' => $noop,
+    'where-cat|location-cat|W' => $noop,
+    'catman|c' => $noop,
+    'recode|R=s' => $noop,
+    'locale|L=s' => $noop,
+    'systems|m=s' => $noop,
+    'manpath|M=s' => $noop,
+    'sections|S|s=s' => $noop,
+    'extension|s=s' => $noop,
+    'ignore-case|i' => $noop,
+    'match-case|I' => $noop,
+    'regex' => $noop,
+    'wildcard' => $noop,
+    'names-only' => $noop,
+    'all|a' => $noop,
+    'update|u' => $noop,
+    'no-subpages' => $noop,
+    'pager|P=s' => $noop,
+    'prompt|r=s' => $noop,
+    'ascii|7' => $noop,
+    'encoding|E=s' => $noop,
+    'no-hyphenation|nh' => $noop,
+    'no-justification|nj' => $noop,
+    'preprocessor|p=s' => $noop,
+    'troff|t' => $noop,
+    'troff-device|T:s' => $noop,
+    'html|H:s' => $noop,
+    'gxditview|X:s' => $noop,
+    'ditroff|Z' => $noop,
+    'help|?' => $noop,
+    'usage' => $noop,
+    'version|V' => $noop,
+);
+
+# ABSTRACT: Wrapper and completer for man (extra Perl stuffs)
+# PODNAME:
+
+=head1 SYNOPSIS
+
+To install, install this module and then in your bash (and/or bash startup
+file):
+
+ % alias man='manwrap-pm'
+ % complete -C manwrap-pm man
+
+or, you can use L<shcompgen> to do that for you automatically.
+
+Now L<man> can also accept and complete Perl module names, à la L<pmman>:
+
+ % man tex/wr<tab>
+ % man Text/Wrap _
+
+
+=head1 DESCRIPTION
+
+I made this wrapper because I like using L<pmman> for completing Perl module
+names and reading Perl module documentation:
+
+ % pmman tex/wr<tab>
+ % pmman Text/Wrap _
+
+but often, due to years of muscle memory, find myself already typing C<man> as
+the command:
+
+ % man _
+
+Thus, this wrapper C<manwrap-pm> (to be aliased as the C<man> command):
+
+ % alias man='manwrap-pm'
+
+has the ability to complete Perl module names à la L<pmman> but also accepts all
+the other C<man> switches and later executes C<man>. And you get the best of
+both worlds.
