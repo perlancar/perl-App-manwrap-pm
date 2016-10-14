@@ -34,24 +34,26 @@ GetOptionsWithCompletion(
         my $type      = $args{type};
         my $word      = $args{word};
         if ($type eq 'arg') {
-            $log->tracef("[_cpanm] Completing arg");
+            $log->tracef("[manwrap-pm] Completing arg");
             # XXX
         } elsif ($type eq 'optval') {
             my $ospec = $args{ospec};
             my $opt   = $args{opt};
-            $log->tracef("[_cpanm] Completing optval (opt=$opt)");
+            $log->tracef("[manwrap-pm] Completing optval (opt=$opt, ospec=$ospec)");
             if ($ospec eq 'config-file|C=s') {
                 return complete_file(filter=>'f', word=>$word);
             } elsif ($ospec eq 'locale|L=s') {
                 require Complete::Locale;
                 return Complete::Locale::complete_locale(word => $word);
             } elsif ($ospec eq 'manpath|M=s') {
+                return complete_file(filter=>'d', word=>$word);
+            } elsif ($ospec eq 'sections|S|s=s') {
                 require Complete::Man;
                 my $ss = Complete::Man::complete_manpage_section(word=>'');
-                complete_comma_sep(word=>$word, elems=>$ss, uniq=>1);
+                return complete_comma_sep(word=>$word, elems=>$ss, uniq=>1);
             } elsif ($ospec eq 'pager|P=s') {
                 require Complete::Program;
-                my $ss = Complete::Program::complete_program(word=>$word);
+                return Complete::Program::complete_program(word=>$word);
             }
         }
         return [];
@@ -72,7 +74,7 @@ GetOptionsWithCompletion(
     'systems|m=s' => $noop,
     'manpath|M=s' => $noop,
     'sections|S|s=s' => $noop,
-    'extension|s=s' => $noop,
+    'extension|e=s' => $noop,
     'ignore-case|i' => $noop,
     'match-case|I' => $noop,
     'regex' => $noop,
