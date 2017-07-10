@@ -9,7 +9,7 @@
 use 5.010001;
 use strict;
 use warnings;
-use Log::Any::IfLOG '$log';
+use Log::ger;
 
 use Complete::File qw(complete_file);
 use Complete::Util qw(complete_array_elem complete_comma_sep);
@@ -48,12 +48,12 @@ GetOptionsWithCompletion(
         my $type      = $args{type};
         my $word      = $args{word};
         if ($type eq 'arg') {
-            $log->tracef("[manwrap-pm] Completing arg");
+            log_trace("[manwrap-pm] Completing arg");
             return $comp_man_or_mod->(%args);
         } elsif ($type eq 'optval') {
             my $ospec = $args{ospec};
             my $opt   = $args{opt};
-            $log->tracef("[manwrap-pm] Completing optval (opt=$opt, ospec=$ospec)");
+            log_trace("[manwrap-pm] Completing optval (opt=$opt, ospec=$ospec)");
             if ($ospec eq 'config-file|C=s') {
                 return complete_file(filter=>'f', word=>$word);
             } elsif ($ospec eq 'locale|L=s') {
