@@ -16,9 +16,9 @@ use Complete::Util qw(complete_array_elem complete_comma_sep);
 use Getopt::Long::Complete qw(GetOptionsWithCompletion);
 
 my $opts = {
-
 };
 my $noop = sub {};
+my $has_arg;
 
 my $comp_man_or_mod = sub {
     require Complete::Man;
@@ -28,10 +28,19 @@ my $comp_man_or_mod = sub {
     my %args = @_;
     my $word = $args{word};
 
+    # XXX for more proper
+    my $has_arg = 0;
+    for (0..$#{ $args{words} }) {
+        if ($_ ne $args{argpos} && /^[^-]/) {
+            $has_arg++;
+            last;
+        }
+    }
+
     my @answers;
     if ($word =~ m!/!) {
         push @answers, Complete::Module::complete_module(word=>$word);
-    } else {
+    } elsif ($word !~ /^-/ && !$has_arg) {
         push @answers, Complete::Man::complete_manpage(word=>$word);
     }
 
