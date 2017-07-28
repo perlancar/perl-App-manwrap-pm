@@ -41,7 +41,7 @@ my $comp_man_or_mod = sub {
     if ($word =~ m!/!) {
         push @answers, Complete::Module::complete_module(word=>$word);
     } elsif ($word !~ /^-/ && !$has_arg) {
-        push @answers, Complete::Man::complete_manpage(word=>$word);
+        push @answers, Complete::Man::complete_manpage(word=>$word, use_mandb=>0);
     }
 
     Complete::Util::combine_answers(@answers);
