@@ -1,3 +1,8 @@
+0.005   2019-07-24  Released-By: PERLANCAR; Urgency: medium
+
+	- [ux] Show message when completing an empty word.
+
+
 0.004   2017-07-29  Released-By: PERLANCAR
 
 	- Skip using mandb to complete manpage because sometimes mandb is
