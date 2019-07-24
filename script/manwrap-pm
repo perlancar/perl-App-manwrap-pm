@@ -56,7 +56,9 @@ GetOptionsWithCompletion(
         my %args  = @_;
         my $type      = $args{type};
         my $word      = $args{word};
-        if ($type eq 'arg') {
+        if ($word eq '') {
+            return {message=>"Gathering list of all modules and manpages will take at least a few seconds. Please type something first."};
+        } elsif ($type eq 'arg') {
             log_trace("[manwrap-pm] Completing arg");
             return $comp_man_or_mod->(%args);
         } elsif ($type eq 'optval') {
