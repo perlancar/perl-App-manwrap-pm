@@ -2,3 +2,4 @@ App-manwrap-pm-*
 .build
 *~
 nytprof*
+.DS_Store
